@@ -3,7 +3,7 @@ import express from 'express';
 import moduleAlias from 'module-alias';
 
 const isProduction = process.env.NODE_ENV === 'production';
-moduleAlias.addAliases({ '@': isProduction ? 'dist' : __dirname });
+moduleAlias.addAlias('@', isProduction ? '/app/dist' : __dirname);
 
 import config from './config';
 import Logger from './loaders/logger';
