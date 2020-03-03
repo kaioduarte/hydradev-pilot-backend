@@ -15,24 +15,12 @@ export default class UserService {
     return this._userModel.find({}, '-password');
   }
 
-  async findById(id: string) {
-    const user = await this._userModel.findById(id, '-password');
-
-    if (!user) {
-      throw new ApiError('User not found', HttpStatus.NOT_FOUND);
-    }
-
-    return user;
+  findById(id: string) {
+    return this._userModel.findById(id, '-password');
   }
 
-  async findByUsername(username: string) {
-    const user = await this._userModel.findOne({ username }, '-password');
-
-    if (!user) {
-      throw new ApiError('User not found', HttpStatus.NOT_FOUND);
-    }
-
-    return user;
+  findByUsername(username: string) {
+    return this._userModel.findOne({ username }, '-password');
   }
 
   async create(input: ICreateUserDto) {
