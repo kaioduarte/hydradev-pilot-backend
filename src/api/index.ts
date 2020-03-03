@@ -15,25 +15,28 @@ export default async () => {
 
   const files = await readDirAsync(path.join(__dirname, 'routes'));
 
-  files.forEach(file => {
-    const registerRoute = require(path.join(__dirname, 'routes', file)).default;
-    const { route, routeName } = registerRoute(app) || {};
+  files
+    .filter(file => file.indexOf('.') !== 0 && file.slice(-3) === '.js')
+    .forEach(file => {
+      const registerRoute = require(path.join(__dirname, 'routes', file))
+        .default;
+      const { route, routeName } = registerRoute(app) || {};
 
-    route?.stack
-      .filter(r => r.route)
-      .map(r => r.route)
-      .forEach(r => {
-        Object.entries(r.methods)
-          .filter(([, registered]) => registered)
-          .forEach(([name]) => {
-            logger.info(
-              `\t▶ ${name.toUpperCase()} ${config.api.prefix}${routeName}${
-                r.path
-              }`,
-            );
-          });
-      });
-  });
+      route?.stack
+        .filter(r => r.route)
+        .map(r => r.route)
+        .forEach(r => {
+          Object.entries(r.methods)
+            .filter(([, registered]) => registered)
+            .forEach(([name]) => {
+              logger.info(
+                `\t▶ ${name.toUpperCase()} ${config.api.prefix}${routeName}${
+                  r.path
+                }`,
+              );
+            });
+        });
+    });
 
   return app;
 };
