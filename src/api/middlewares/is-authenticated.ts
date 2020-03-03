@@ -16,13 +16,12 @@ export function isAuthenticated(req: Request, _res, next) {
     token = req.query.token;
   }
 
-  jwt.verify(token, config.jwtSecret, async (err, decoded) => {
-    if (err) {
-      throw new ApiError(`JWT Error: ${err.message}`, HttpStatus.BAD_REQUEST);
-    }
-
+  try {
+    const decoded: any = jwt.verify(token, config.jwtSecret);
     req.token = decoded;
+  } catch (err) {
+    throw new ApiError(`JWT Error: ${err.message}`, HttpStatus.BAD_REQUEST);
+  }
 
-    return next();
-  });
+  return next();
 }
