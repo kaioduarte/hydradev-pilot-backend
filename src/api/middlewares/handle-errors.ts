@@ -1,7 +1,12 @@
 import { Response } from 'express';
 import HttpStatus from 'http-status-codes';
+import { Container } from 'typedi';
+import { Logger } from 'winston';
 
 export function handleErrors(error, _req, res: Response, _next) {
+  const logger = Container.get<Logger>('logger');
+  logger.error('🔥 Error: %o', error);
+
   let statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
   let message = `Server error`;
 
