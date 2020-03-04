@@ -16,7 +16,11 @@ export default async () => {
   const files = await readDirAsync(path.join(__dirname, 'routes'));
 
   files
-    .filter(file => file.indexOf('.') !== 0 && file.slice(-3) === '.js')
+    .filter(
+      file =>
+        file.indexOf('.') !== 0 &&
+        (file.slice(-3) === '.js' || file.slice(-3) === '.ts'),
+    )
     .forEach(file => {
       const registerRoute = require(path.join(__dirname, 'routes', file))
         .default;
