@@ -15,12 +15,12 @@ export default class UserService {
     return this._userModel.find({}, '-password');
   }
 
-  findById(id: string) {
-    return this._userModel.findById(id, '-password');
+  findById(id: string, projection = '') {
+    return this._userModel.findById(id, projection);
   }
 
-  findByUsername(username: string) {
-    return this._userModel.findOne({ username }, '-password');
+  findByUsername(username: string, projection = '') {
+    return this._userModel.findOne({ username }, projection);
   }
 
   async create(input: ICreateUserDto) {
@@ -45,6 +45,6 @@ export default class UserService {
       );
     }
 
-    return userCreated;
+    return this.findByUsername(input.username, '-password');
   }
 }
