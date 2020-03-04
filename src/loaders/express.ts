@@ -18,6 +18,7 @@ export default async ({ app }: { app: Application }) => {
   app.use(bodyParser.urlencoded({ limit: '15mb', extended: true }));
   app.use(errors());
   app.use(jsend.middleware);
+  app.use(middlewares.logger);
 
   // Load API routes
   app.use(config.api.prefix, await routes());
