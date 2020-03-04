@@ -6,7 +6,7 @@ import UserService from '@/services/user.service';
 
 export async function attachCurrentUser(req: Request, _res, next) {
   const userService = Container.get(UserService);
-  const user = await userService.findById(req.token?._id);
+  const user = await userService.findById(req.token?._id, '-password');
 
   if (!user) {
     throw new ApiError('User not found!', HttpStatus.NOT_FOUND);

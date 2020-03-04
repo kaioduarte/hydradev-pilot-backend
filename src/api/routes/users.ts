@@ -55,7 +55,7 @@ export default (app: Router) => {
         throw new ApiError('You can just see your data', HttpStatus.FORBIDDEN);
       }
 
-      const user = await userService.findById(req.params.id);
+      const user = await userService.findById(req.params.id, '-password');
 
       if (!user) {
         throw new ApiError('User not found', HttpStatus.NOT_FOUND);

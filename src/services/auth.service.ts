@@ -24,16 +24,17 @@ export default class AuthService {
   }
 
   async signIn(input: ISignInDto): Promise<{ user: IUser; token: string }> {
-    const user = await this._userService.findByUsername(input.username);
+    const userRecord = await this._userService.findByUsername(input.username);
 
-    if (!user) {
+    if (!userRecord) {
       throw new ApiError('User not registered', HttpStatus.NOT_FOUND);
     }
 
-    if (!(await bcrypt.compareSync(input.password, user.password))) {
+    if (!(await bcrypt.compareSync(input.password, userRecord.password))) {
       throw new ApiError('Credentials are wrong', HttpStatus.BAD_REQUEST);
     }
 
+    const { password, ...user } = userRecord.toJSON();
     const token = this._generateToken(user);
 
     return { user, token };
