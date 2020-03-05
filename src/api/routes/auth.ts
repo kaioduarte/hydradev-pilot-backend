@@ -26,12 +26,9 @@ export default (app: Router) => {
     async (req: Request, res: Response) => {
       const { user, token } = await authService.signUp(req.body as ISignUpDto);
 
-      return res.jsend.success({
-        status: HttpStatus.OK,
-        data: {
-          user,
-          token,
-        },
+      return res.status(HttpStatus.OK).jsend.success({
+        user,
+        token,
       });
     },
   );
@@ -46,12 +43,9 @@ export default (app: Router) => {
     }),
     async (req: Request, res: Response) => {
       const { user, token } = await authService.signIn(req.body as ISignInDto);
-      return res.jsend.success({
-        status: HttpStatus.OK,
-        data: {
-          user,
-          token,
-        },
+      return res.status(HttpStatus.OK).jsend.success({
+        user,
+        token,
       });
     },
   );
