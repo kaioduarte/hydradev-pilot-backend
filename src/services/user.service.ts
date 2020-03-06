@@ -48,6 +48,22 @@ export default class UserService {
     return this.findByUsername(input.username, '-password');
   }
 
+  async patch(_id: string, input: Partial<ICreateUserDto>) {
+    const user = await this.findById(_id);
+
+    if (!user) {
+      throw new ApiError('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (input.password) {
+      input.password = bcrypt.hashSync(input.password, 12);
+    }
+
+    Object.entries(input).forEach(([key, val]) => (user[key] = val));
+
+    return user.save({ validateBeforeSave: true, safe: true });
+  }
+
   async delete(_id: string) {
     const user = await this.findById(_id);
 

@@ -65,6 +65,38 @@ export default (app: Router) => {
     },
   );
 
+  route.patch(
+    '/:id',
+    middlewares.isAuthenticated,
+    middlewares.attachCurrentUser,
+    celebrate({
+      body: Joi.object({
+        name: Joi.string(),
+        username: Joi.string(),
+        password: Joi.string(),
+        role: Joi.string().valid('basic', 'admin'),
+      }),
+    }),
+    async (req: Request, res: Response) => {
+      if (!isValidObjectId(req.params.id)) {
+        throw new ApiError('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+      }
+
+      if (req.user?._id !== req.params.id && req.user?.role !== 'admin') {
+        throw new ApiError('You can just edit your data', HttpStatus.FORBIDDEN);
+      }
+
+      if (!req.body) {
+        return res.status(HttpStatus.NO_CONTENT).jsend.success(null);
+      }
+
+      await userService.patch(req.params.id, req.body);
+      const user = await userService.findById(req.params.id, '-password');
+
+      return res.status(HttpStatus.OK).jsend.success({ user });
+    },
+  );
+
   route.post(
     '/',
     middlewares.isAuthenticated,
