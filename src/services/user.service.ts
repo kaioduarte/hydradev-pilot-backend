@@ -61,7 +61,7 @@ export default class UserService {
 
     Object.entries(input).forEach(([key, val]) => (user[key] = val));
 
-    return user.save({ validateBeforeSave: true, safe: true });
+    return user.save({ validateBeforeSave: true });
   }
 
   async delete(_id: string) {
