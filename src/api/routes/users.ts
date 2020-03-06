@@ -69,6 +69,7 @@ export default (app: Router) => {
     '/',
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
+    middlewares.isAdmin,
     celebrate({
       body: Joi.object({
         name: Joi.string().required(),
@@ -78,16 +79,11 @@ export default (app: Router) => {
       }),
     }),
     async (req: Request, res: Response) => {
-      if (req.user?.role !== 'admin') {
-        throw new ApiError(
-          "You don't have permission to perform this action",
-          HttpStatus.FORBIDDEN,
-        );
-      }
-
       const userCreated = await userService.create(req.body as ICreateUserDto);
 
-      return res.status(HttpStatus.OK).jsend.success({ user: userCreated });
+      return res
+        .status(HttpStatus.CREATED)
+        .jsend.success({ user: userCreated });
     },
   );
 
