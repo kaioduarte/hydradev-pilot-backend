@@ -9,7 +9,7 @@ export async function attachCurrentUser(req: Request, _res, next) {
   const user = await userService.findById(req.token?._id, '-password');
 
   if (!user) {
-    throw new ApiError('User not found!', HttpStatus.NOT_FOUND);
+    throw new ApiError('This user does not exist!', HttpStatus.UNAUTHORIZED);
   }
 
   req.user = user;
