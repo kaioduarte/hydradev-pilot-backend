@@ -47,4 +47,14 @@ export default class UserService {
 
     return this.findByUsername(input.username, '-password');
   }
+
+  async delete(_id: string) {
+    const user = await this.findById(_id);
+
+    if (!user) {
+      throw new ApiError('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    return user.remove();
+  }
 }

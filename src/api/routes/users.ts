@@ -87,5 +87,16 @@ export default (app: Router) => {
     },
   );
 
+  route.delete(
+    '/:id',
+    middlewares.isAuthenticated,
+    middlewares.attachCurrentUser,
+    middlewares.isAdmin,
+    async (req: Request, res: Response) => {
+      await userService.delete(req.params.id);
+      return res.status(HttpStatus.NO_CONTENT).jsend.success(null);
+    },
+  );
+
   return { route, routeName };
 };
