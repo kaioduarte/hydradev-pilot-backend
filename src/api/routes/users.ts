@@ -97,6 +97,35 @@ export default (app: Router) => {
     },
   );
 
+  route.put(
+    '/:id',
+    middlewares.isAuthenticated,
+    middlewares.attachCurrentUser,
+    celebrate({
+      body: Joi.object({
+        name: Joi.string().required(),
+        username: Joi.string().required(),
+        role: Joi.string()
+          .valid('basic', 'admin')
+          .required(),
+      }),
+    }),
+    async (req: Request, res: Response) => {
+      if (!isValidObjectId(req.params.id)) {
+        throw new ApiError('Invalid ObjectId', HttpStatus.BAD_REQUEST);
+      }
+
+      if (req.user?._id !== req.params.id && req.user?.role !== 'admin') {
+        throw new ApiError('You can just edit your data', HttpStatus.FORBIDDEN);
+      }
+
+      await userService.update(req.params.id, req.body);
+      const user = await userService.findById(req.params.id, '-password');
+
+      return res.status(HttpStatus.OK).jsend.success({ user });
+    },
+  );
+
   route.post(
     '/',
     middlewares.isAuthenticated,

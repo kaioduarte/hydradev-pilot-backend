@@ -64,6 +64,16 @@ export default class UserService {
     return user.save({ validateBeforeSave: true });
   }
 
+  async update(_id: string, input: Partial<ICreateUserDto>) {
+    const user = await this.findById(_id);
+
+    if (!user) {
+      throw new ApiError('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    return await this._userModel.updateOne({ _id }, { $set: input });
+  }
+
   async delete(_id: string) {
     const user = await this.findById(_id);
 
