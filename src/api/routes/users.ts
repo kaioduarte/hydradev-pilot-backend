@@ -1,10 +1,9 @@
 import { Container } from 'typedi';
 import { Router, Request, Response } from 'express';
 import HttpStatus from 'http-status-codes';
-import { isValidObjectId } from 'mongoose';
+import { celebrate, Joi } from 'celebrate';
 import * as middlewares from '@/api/middlewares';
 import { ApiError } from '@/api/errors/api-error';
-import { celebrate, Joi } from 'celebrate';
 import UserService from '@/services/user.service';
 import { ICreateUserDto } from '@/interfaces/dto/create-user.dto';
 
@@ -17,23 +16,11 @@ export default (app: Router) => {
   app.use(routeName, route);
 
   route.get(
-    '/me',
-    middlewares.isAuthenticated,
-    middlewares.attachCurrentUser,
-    (req: Request, res: Response) => {
-      res.status(HttpStatus.OK).jsend.success({ user: req.user });
-    },
-  );
-
-  route.get(
     '/',
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
+    middlewares.isAdmin,
     async (req: Request, res: Response) => {
-      if (req.user?.role !== 'admin') {
-        throw new ApiError('You can just see your data', HttpStatus.FORBIDDEN);
-      }
-
       const users = await userService.findAll();
 
       return res
@@ -43,19 +30,12 @@ export default (app: Router) => {
   );
 
   route.get(
-    '/:id',
+    '/:userId',
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
+    middlewares.checkPermission,
     async (req: Request, res: Response) => {
-      if (!isValidObjectId(req.params.id)) {
-        throw new ApiError('Invalid ObjectId', HttpStatus.BAD_REQUEST);
-      }
-
-      if (req.user?._id !== req.params.id && req.user?.role !== 'admin') {
-        throw new ApiError('You can just see your data', HttpStatus.FORBIDDEN);
-      }
-
-      const user = await userService.findById(req.params.id, '-password');
+      const user = await userService.findById(req.params.userId);
 
       if (!user) {
         throw new ApiError('User not found', HttpStatus.NOT_FOUND);
@@ -66,9 +46,10 @@ export default (app: Router) => {
   );
 
   route.patch(
-    '/:id',
+    '/:userId',
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
+    middlewares.checkPermission,
     celebrate({
       body: Joi.object({
         name: Joi.string(),
@@ -78,29 +59,22 @@ export default (app: Router) => {
       }),
     }),
     async (req: Request, res: Response) => {
-      if (!isValidObjectId(req.params.id)) {
-        throw new ApiError('Invalid ObjectId', HttpStatus.BAD_REQUEST);
-      }
-
-      if (req.user?._id !== req.params.id && req.user?.role !== 'admin') {
-        throw new ApiError('You can just edit your data', HttpStatus.FORBIDDEN);
-      }
-
       if (!req.body) {
         return res.status(HttpStatus.NO_CONTENT).jsend.success(null);
       }
 
-      await userService.patch(req.params.id, req.body);
-      const user = await userService.findById(req.params.id, '-password');
+      await userService.patch(req.params.userId, req.body);
+      const user = await userService.findById(req.params.userId);
 
       return res.status(HttpStatus.OK).jsend.success({ user });
     },
   );
 
   route.put(
-    '/:id',
+    '/:userId',
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
+    middlewares.checkPermission,
     celebrate({
       body: Joi.object({
         name: Joi.string().required(),
@@ -111,16 +85,8 @@ export default (app: Router) => {
       }),
     }),
     async (req: Request, res: Response) => {
-      if (!isValidObjectId(req.params.id)) {
-        throw new ApiError('Invalid ObjectId', HttpStatus.BAD_REQUEST);
-      }
-
-      if (req.user?._id !== req.params.id && req.user?.role !== 'admin') {
-        throw new ApiError('You can just edit your data', HttpStatus.FORBIDDEN);
-      }
-
-      await userService.update(req.params.id, req.body);
-      const user = await userService.findById(req.params.id, '-password');
+      await userService.update(req.params.userId, req.body);
+      const user = await userService.findById(req.params.userId);
 
       return res.status(HttpStatus.OK).jsend.success({ user });
     },
@@ -149,12 +115,12 @@ export default (app: Router) => {
   );
 
   route.delete(
-    '/:id',
+    '/:userId',
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
     middlewares.isAdmin,
     async (req: Request, res: Response) => {
-      await userService.delete(req.params.id);
+      await userService.delete(req.params.userId);
       return res.status(HttpStatus.NO_CONTENT).jsend.success(null);
     },
   );

@@ -12,15 +12,15 @@ export default class UserService {
   ) {}
 
   async findAll() {
-    return this._userModel.find({}, '-password');
+    return this._userModel.find({});
   }
 
-  findById(id: string, projection = '') {
-    return this._userModel.findById(id, projection);
+  findById(id: string) {
+    return this._userModel.findById(id);
   }
 
-  findByUsername(username: string, projection = '') {
-    return this._userModel.findOne({ username }, projection);
+  findByUsername(username: string) {
+    return this._userModel.findOne({ username });
   }
 
   async create(input: ICreateUserDto) {
@@ -40,12 +40,12 @@ export default class UserService {
 
     if (!userCreated) {
       throw new ApiError(
-        'User cannot be created',
+        'User could not be created',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
 
-    return this.findByUsername(input.username, '-password');
+    return this.findByUsername(input.username);
   }
 
   async patch(_id: string, input: Partial<ICreateUserDto>) {
