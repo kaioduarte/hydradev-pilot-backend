@@ -6,7 +6,7 @@ import UserService from '@/services/user.service';
 
 export async function attachCurrentUser(req: Request, _res, next) {
   const userService = Container.get(UserService);
-  const user = await userService.findById(req.token?._id, '-password');
+  const user = await userService.findById(req.token?._id);
 
   if (!user) {
     throw new ApiError('This user does not exist!', HttpStatus.UNAUTHORIZED);

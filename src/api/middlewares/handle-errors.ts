@@ -8,7 +8,7 @@ export function handleErrors(error, _req, res: Response, _next) {
   logger.error('🔥 Error: %o', error);
 
   let statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
-  let message = `Server error`;
+  let message = 'Server error';
 
   if (!error) {
     return res.status(statusCode).jsend.error({ message });
@@ -20,7 +20,7 @@ export function handleErrors(error, _req, res: Response, _next) {
       message = error.message;
       break;
     default:
-      message = error.message;
+      message = 'Server error';
       break;
   }
 
