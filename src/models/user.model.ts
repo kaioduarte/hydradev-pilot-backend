@@ -16,10 +16,16 @@ const UserSchema = new Schema(
       index: true,
     },
 
-    password: String,
+    password: {
+      type: String,
+      select: false,
+      required: true,
+    },
 
     role: {
       type: String,
+      required: true,
+      enum: ['basic', 'admin'],
       default: 'basic',
     },
   },
