@@ -13,8 +13,18 @@ export default async ({ expressApp }) => {
     model: require('@/models/user.model').default,
   };
 
+  const cardModel = {
+    name: 'cardModel',
+    model: require('@/models/card.model').default,
+  };
+
+  const collectionModel = {
+    name: 'collectionModel',
+    model: require('@/models/collection.model').default,
+  };
+
   await dependencyInjectorLoader({
-    models: [userModel],
+    models: [userModel, cardModel, collectionModel],
   });
 
   Logger.info('✌️ Dependency Injector loaded');
