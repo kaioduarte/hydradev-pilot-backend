@@ -24,7 +24,9 @@ export default class AuthService {
   }
 
   async signIn(input: ISignInDto): Promise<{ user: IUser; token: string }> {
-    const userRecord = await this._userService.findByUsername(input.username);
+    const userRecord = await this._userService
+      .findByUsername(input.username)
+      .select('+password');
 
     if (!userRecord) {
       throw new ApiError('User not registered', HttpStatus.NOT_FOUND);
