@@ -1,8 +1,8 @@
-import { Document } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { IUser } from './user.interface';
 
 export interface ICard extends Document {
-  _id: string;
+  _id: Schema.Types.ObjectId;
   image: Buffer;
   mana: number;
   name: string;
