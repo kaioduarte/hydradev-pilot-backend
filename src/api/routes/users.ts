@@ -20,8 +20,15 @@ export default (app: Router) => {
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
     middlewares.isAdmin,
+    celebrate({
+      query: Joi.object({
+        name: Joi.string()
+          .empty('')
+          .default(''),
+      }),
+    }),
     async (req: Request, res: Response) => {
-      const users = await userService.findAll();
+      const users = await userService.findAll(req.query.name);
 
       return res
         .status(HttpStatus.OK)

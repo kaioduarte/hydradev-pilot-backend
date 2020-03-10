@@ -11,8 +11,8 @@ export default class UserService {
     @Inject('logger') private _logger,
   ) {}
 
-  async findAll() {
-    return this._userModel.find({});
+  async findAll(name = '') {
+    return this._userModel.find({ name: { $regex: name, $options: 'i' } });
   }
 
   findById(id: string) {
