@@ -1,6 +1,5 @@
 import { Application } from 'express';
 import 'express-async-errors';
-import { errors } from 'celebrate';
 import bodyParser from 'body-parser';
 import jsend from 'jsend';
 import config from '@/config';
@@ -16,7 +15,6 @@ export default async ({ app }: { app: Application }) => {
   app.use(require('helmet')());
   app.use(bodyParser.json({ limit: '15mb' }));
   app.use(bodyParser.urlencoded({ limit: '15mb', extended: true }));
-  app.use(errors());
   app.use(jsend.middleware);
   app.use(middlewares.logger);
 
