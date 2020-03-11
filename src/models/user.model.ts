@@ -7,6 +7,9 @@ const UserSchema = new Schema(
       type: String,
       required: [true, 'Please enter a full name'],
       index: true,
+      minlength: 3,
+      maxlength: 255,
+      trim: true,
     },
 
     username: {
@@ -14,6 +17,9 @@ const UserSchema = new Schema(
       lowercase: true,
       unique: true,
       index: true,
+      minlength: 3,
+      maxlength: 64,
+      trim: true,
     },
 
     password: {
