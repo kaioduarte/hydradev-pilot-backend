@@ -21,7 +21,7 @@ export function handleErrors(error, _req, res: Response, _next) {
     statusCode = error.status;
     message = error.message;
   } else if (isCelebrate(error)) {
-    statusCode = HttpStatus.BAD_GATEWAY;
+    statusCode = HttpStatus.BAD_REQUEST;
     message = 'Invalid request!';
     errors = error.joi.details.reduce(
       (acc, entry) => ({
