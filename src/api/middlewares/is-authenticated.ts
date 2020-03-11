@@ -20,7 +20,22 @@ export function isAuthenticated(req: Request, _res, next) {
     const decoded: any = jwt.verify(token, config.jwtSecret);
     req.token = decoded;
   } catch (err) {
-    throw new ApiError(`JWT Error: ${err.message}`, HttpStatus.BAD_REQUEST);
+    let message: string;
+    let code = HttpStatus.BAD_REQUEST;
+
+    switch (err.name) {
+      case 'TokenExpiredError': {
+        message = 'Your session has expired. Please login again';
+        code = HttpStatus.UNAUTHORIZED;
+        break;
+      }
+
+      default: {
+        message = `JWT Error: ${err.message}`;
+      }
+    }
+
+    throw new ApiError(message, code);
   }
 
   return next();
