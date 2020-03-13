@@ -4,6 +4,7 @@ import HttpStatus from 'http-status-codes';
 import * as middlewares from '@/api/middlewares';
 import { celebrate, Joi } from 'celebrate';
 import CardService from '@/services/card.service';
+import { joiOptions } from '@/config/celebrate';
 
 const route = Router();
 
@@ -17,13 +18,16 @@ export default (app: Router) => {
     '/',
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
-    celebrate({
-      query: Joi.object({
-        name: Joi.string()
-          .empty('')
-          .default(''),
-      }),
-    }),
+    celebrate(
+      {
+        query: Joi.object({
+          name: Joi.string()
+            .empty('')
+            .default(''),
+        }),
+      },
+      joiOptions,
+    ),
     async (req: Request, res: Response) => {
       const cards = await cardService.findAll(req.query.name);
       return res.status(HttpStatus.OK).jsend.success({ cards });
