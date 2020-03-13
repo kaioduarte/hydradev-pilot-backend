@@ -11,6 +11,7 @@ const CardSchema = new Schema(
     mana: {
       type: Number,
       required: true,
+      min: 0,
     },
 
     name: {
@@ -19,7 +20,10 @@ const CardSchema = new Schema(
       index: true,
     },
 
-    description: String,
+    description: {
+      type: String,
+      maxlength: 255,
+    },
 
     type: {
       type: String,
@@ -27,8 +31,14 @@ const CardSchema = new Schema(
       required: true,
     },
 
-    attack: Number,
-    defense: Number,
+    attack: {
+      type: Number,
+      min: 0,
+    },
+    defense: {
+      type: Number,
+      min: 0,
+    },
 
     user: {
       type: Schema.Types.ObjectId,

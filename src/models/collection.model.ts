@@ -1,10 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { ICard } from '@/interfaces/models/card.interface';
 import { ICollection } from '@/interfaces/models/collection.interface';
-
-function arrayLimit(val: ICard[]) {
-  return val.length <= 60;
-}
 
 const CollectionSchema = new Schema(
   {
@@ -12,6 +7,8 @@ const CollectionSchema = new Schema(
       type: String,
       required: [true, 'Please enter a name'],
       index: true,
+      minlength: 3,
+      maxlength: 255,
     },
 
     user: {
@@ -26,7 +23,6 @@ const CollectionSchema = new Schema(
           ref: 'Card',
         },
       ],
-      validate: [arrayLimit, '{PATH} exceeds the limit of 60'],
     },
   },
   { timestamps: true },
