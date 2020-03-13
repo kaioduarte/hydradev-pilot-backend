@@ -6,6 +6,7 @@ import * as middlewares from '@/api/middlewares';
 import { ApiError } from '@/api/errors/api-error';
 import UserService from '@/services/user.service';
 import { ICreateUserDto } from '@/interfaces/dto/create-user.dto';
+import { joiOptions } from '@/config/celebrate';
 
 const route = Router();
 
@@ -20,13 +21,16 @@ export default (app: Router) => {
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
     middlewares.isAdmin,
-    celebrate({
-      query: Joi.object({
-        name: Joi.string()
-          .empty('')
-          .default(''),
-      }),
-    }),
+    celebrate(
+      {
+        query: Joi.object({
+          name: Joi.string()
+            .empty('')
+            .default(''),
+        }),
+      },
+      joiOptions,
+    ),
     async (req: Request, res: Response) => {
       const users = await userService.findAll(req.query.name);
 
@@ -56,15 +60,18 @@ export default (app: Router) => {
     '/:userId',
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
-    middlewares.checkPermission,
-    celebrate({
-      body: Joi.object({
-        name: Joi.string(),
-        username: Joi.string(),
-        password: Joi.string(),
-        role: Joi.string().valid('basic', 'admin'),
-      }),
-    }),
+    middlewares.isAdmin,
+    celebrate(
+      {
+        body: Joi.object({
+          name: Joi.string(),
+          username: Joi.string(),
+          password: Joi.string(),
+          role: Joi.string().valid('basic', 'admin'),
+        }),
+      },
+      joiOptions,
+    ),
     async (req: Request, res: Response) => {
       if (!req.body) {
         return res.status(HttpStatus.NO_CONTENT).jsend.success(null);
@@ -81,16 +88,16 @@ export default (app: Router) => {
     '/:userId',
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
-    middlewares.checkPermission,
-    celebrate({
-      body: Joi.object({
-        name: Joi.string().required(),
-        username: Joi.string().required(),
-        role: Joi.string()
-          .valid('basic', 'admin')
-          .required(),
-      }),
-    }),
+    middlewares.isAdmin,
+    celebrate(
+      {
+        body: Joi.object({
+          name: Joi.string().required(),
+          username: Joi.string().required(),
+        }),
+      },
+      joiOptions,
+    ),
     async (req: Request, res: Response) => {
       await userService.update(req.params.userId, req.body);
       const user = await userService.findById(req.params.userId);
@@ -104,14 +111,17 @@ export default (app: Router) => {
     middlewares.isAuthenticated,
     middlewares.attachCurrentUser,
     middlewares.isAdmin,
-    celebrate({
-      body: Joi.object({
-        name: Joi.string().required(),
-        username: Joi.string().required(),
-        password: Joi.string().required(),
-        role: Joi.string().valid('basic', 'admin'),
-      }),
-    }),
+    celebrate(
+      {
+        body: Joi.object({
+          name: Joi.string().required(),
+          username: Joi.string().required(),
+          password: Joi.string().required(),
+          role: Joi.string().valid('basic', 'admin'),
+        }),
+      },
+      joiOptions,
+    ),
     async (req: Request, res: Response) => {
       const userCreated = await userService.create(req.body as ICreateUserDto);
 
@@ -128,7 +138,7 @@ export default (app: Router) => {
     middlewares.isAdmin,
     async (req: Request, res: Response) => {
       await userService.delete(req.params.userId);
-      return res.status(HttpStatus.NO_CONTENT).jsend.success(null);
+      return res.status(HttpStatus.OK).jsend.success(null);
     },
   );
 
