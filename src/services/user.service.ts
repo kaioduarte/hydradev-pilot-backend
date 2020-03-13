@@ -7,6 +7,8 @@ import { ICreateUserDto } from '@/interfaces/dto/create-user.dto';
 @Service()
 export default class UserService {
   constructor(
+    @Inject('cardModel') private _cardModel: Models.CardModel,
+    @Inject('collectionModel') private _collectionModel: Models.CollectionModel,
     @Inject('userModel') private _userModel: Models.UserModel,
     @Inject('logger') private _logger,
   ) {}
@@ -81,6 +83,10 @@ export default class UserService {
       throw new ApiError('User not found', HttpStatus.NOT_FOUND);
     }
 
-    return user.remove();
+    return Promise.all([
+      this._collectionModel.deleteMany({ user: _id }),
+      this._cardModel.deleteMany({ user: _id }),
+      user.remove(),
+    ]);
   }
 }

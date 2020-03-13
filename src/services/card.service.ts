@@ -7,6 +7,7 @@ import { ICreateCardDto } from '@/interfaces/dto/create-card.dto';
 export default class CardService {
   constructor(
     @Inject('cardModel') private _cardModel: Models.CardModel,
+    @Inject('collectionModel') private _collectionModel: Models.CollectionModel,
     @Inject('logger') private _logger,
   ) {}
 
@@ -21,6 +22,15 @@ export default class CardService {
   }
 
   async create(input: ICreateCardDto, userId: string) {
+    const cardsNumber = await this._cardModel.count({ user: userId });
+
+    if (cardsNumber >= 60) {
+      throw new ApiError(
+        'You have exceeded the number of cards, try delete one!',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
     const cardCreated = await this._cardModel.create({
       ...input,
       user: userId,
@@ -33,7 +43,7 @@ export default class CardService {
       );
     }
 
-    return this._cardModel.findById(cardCreated._id).populate('user');
+    return this._cardModel.findById(cardCreated._id).populate('user', 'name');
   }
 
   async update(cardId: string, input: ICreateCardDto) {
@@ -50,5 +60,12 @@ export default class CardService {
     if (!card) {
       throw new ApiError('Card not found', HttpStatus.NOT_FOUND);
     }
+
+    return this._collectionModel.update(
+      {},
+      {
+        $pullAll: { cards: cardId },
+      },
+    );
   }
 }
